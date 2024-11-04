@@ -18,6 +18,14 @@ type AuthorSorter = (first: Author, second: Author) => number;
 document.addEventListener("DOMContentLoaded", siteCode)
 
 let authors: Author[] = [];
+let idSortAscending = true;
+let nameSortAscending = true;
+let birthDateSortAscending = true;
+let ageSortAscending = true;
+let nationalitySortAscending = true;
+let bibliographySortAscending = true
+let yearsActiveSortAscending = true
+
 
 async function siteCode() {
     try {
@@ -35,7 +43,7 @@ async function siteCode() {
     idSort.addEventListener("click", sortById);
 
     const birthDateSort = document.getElementById("sort-birth-date")!;
-    birthDateSort.addEventListener("click", sortByBirthDate);
+    birthDateSort.addEventListener("click", sortByBirth);
 
     const nationalitySort = document.getElementById("sort-nationality")!;
     nationalitySort.addEventListener("click", sortByNationality);
@@ -45,6 +53,9 @@ async function siteCode() {
 
     const ageSort = document.getElementById("sort-age")!;
     ageSort.addEventListener("click", sortByAge);
+
+    const yearsActiveSort = document.getElementById("sort-years-active")!;
+    yearsActiveSort.addEventListener("click", sortByYearsActive);
 
     const applyFilterButton = document.getElementById("apply-filter")!;
     applyFilterButton.addEventListener("click", applyFilter)
@@ -58,43 +69,95 @@ async function siteCode() {
    }
 }
 
-const nameSorter: AuthorSorter = (first, second) => first.name.localeCompare(second.name);
-const idSorter: AuthorSorter = (first, second) => first.id - second.id;
-const birthDateSorter: AuthorSorter = (first, second) => new Date(first.birth_date).getTime() - new Date(second.birth_date).getTime();
-const nationalitySorter: AuthorSorter = (first, second) => first.nationality.localeCompare(second.nationality);
-const bibliographySorter: AuthorSorter = (first, second) => first.bibliography.length - second.bibliography.length;
-const ageSorter: AuthorSorter = (first, second) => getAuthorAge(first) - getAuthorAge(second);
+const sortById = () => {
+    const sortedAuthors = authors.slice().sort((first, second) => 
+        idSortAscending ? first.id - second.id : second.id - first.id
+    );
+    displayAuthors(sortedAuthors);
+    idSortAscending = !idSortAscending;
+
+    const idSort = document.getElementById("sort-id")!;
+    idSort.innerText = idSortAscending ? "Sort ▲" : "Sort ▼";
+}
 
 const sortByName = () => {
-    const sortedAuthors = authors.toSorted(nameSorter);
+    const sortedAuthors = authors.slice().sort((first, second) => 
+        nameSortAscending ? first.name.localeCompare(second.name) : second.name.localeCompare(first.name)
+    );
     displayAuthors(sortedAuthors);
+    nameSortAscending = !nameSortAscending;
+
+    const nameSort = document.getElementById("sort-name")!;
+    nameSort.innerText = nameSortAscending ? "Sort ▲" : "Sort ▼";
 }
 
-const sortById = () => {
-    const sortedAuthors = authors.toSorted(idSorter);
+const sortByBirth = () => {
+    const sortedAuthors = authors.slice().sort((first, second) => 
+        birthDateSortAscending ? first.birth_date.localeCompare(second.birth_date) : second.birth_date.localeCompare(first.birth_date)
+    );
     displayAuthors(sortedAuthors);
-}
+    birthDateSortAscending = !birthDateSortAscending
 
-const sortByBirthDate = () => {
-    const sortedAuthors = authors.toSorted(birthDateSorter);
-    displayAuthors(sortedAuthors);
-}
-
-const sortByNationality = () => {
-    const sortedAuthors = authors.toSorted(nationalitySorter);
-    displayAuthors(sortedAuthors);
-}
-
-const sortByBibliography = () => {
-    const sortedAuthors = authors.toSorted(bibliographySorter);
-    displayAuthors(sortedAuthors);
+    const birthSort = document.getElementById("sort-birth")!;
+    birthSort.innerText = nameSortAscending ? "Sort ▲" : "Sort ▼";
 }
 
 const sortByAge = () => {
-    const sortedAuthors = authors.toSorted(ageSorter);
+    const sortedAuthors = authors.slice().sort((first, second) => {
+        const firstAge = getAuthorAge(first);
+        const secondAge = getAuthorAge(second);
+        
+        return ageSortAscending ? firstAge - secondAge : secondAge - firstAge;
+    });
+    
     displayAuthors(sortedAuthors);
+    ageSortAscending = !ageSortAscending;
+
+    const ageSort = document.getElementById("sort-age")!;
+    ageSort.innerText = ageSortAscending ? "Sort ▲" : "Sort ▼";
 }
 
+const sortByNationality = () => {
+    const sortedAuthors = authors.slice().sort((first, second) => 
+        nationalitySortAscending ? first.nationality.localeCompare(second.nationality) : second.nationality.localeCompare(first.nationality)
+    );
+    displayAuthors(sortedAuthors);
+    nationalitySortAscending = !nationalitySortAscending;
+
+    const nationalitySort = document.getElementById("sort-nationality")!;
+    nationalitySort.innerText = nationalitySortAscending ? "Sort ▲" : "Sort ▼";
+}
+const sortByBibliography = () => {
+    const sortedAuthors = authors.slice().sort((first, second) => 
+        bibliographySortAscending ? first.bibliography.length - second.bibliography.length : second.bibliography.length - first.bibliography.length
+    );
+    displayAuthors(sortedAuthors);
+    bibliographySortAscending = !bibliographySortAscending;
+
+    const bibliographySort = document.getElementById("sort-bibliography")!;
+    bibliographySort.innerText = bibliographySortAscending ? "Sort ▲" : "Sort ▼";
+}
+
+const sortByYearsActive = () => {
+    const sortedAuthors = authors.slice().sort((first, second) => {
+        const [firstStart, firstEnd] = getYearsActive(first);
+        const [secondStart, secondEnd] = getYearsActive(second);
+
+        // First sort by start year (0 for N/A if no active years), then by end year (also 0 for N/A)
+        if (firstStart === 0 && secondStart === 0) return 0; // both have no active years
+        if (firstStart === 0) return 1; // first has no active years, comes after second
+        if (secondStart === 0) return -1; // second has no active years, comes after first
+
+        if (firstStart !== secondStart) return yearsActiveSortAscending ? firstStart - secondStart : secondStart - firstStart;
+        return yearsActiveSortAscending ? firstEnd - secondEnd : secondEnd - firstEnd;
+    });
+    
+    displayAuthors(sortedAuthors);
+    yearsActiveSortAscending = !yearsActiveSortAscending;
+
+    const yearsActiveSort = document.getElementById("sort-years-active")!;
+    yearsActiveSort.innerText = yearsActiveSortAscending ? "Sort ▲" : "Sort ▼";
+};
 
 const fillNationalities = (authors: Author[]) => {
     const filter = document.getElementById("nationality-filter") as HTMLSelectElement;
@@ -148,7 +211,7 @@ const applyFilter = () => {
 
 
 const loadData = async () => {
-    const dataUri = "https://raw.githubusercontent.com/sweko/uacs-internet-programming-exams/main/dry-run-mid-term/data/authors.json";
+    const dataUri = " https://raw.githubusercontent.com/sweko/uacs-internet-programming-exams/main/dry-run-mid-term-2024/data/authors.json";
     const response = await fetch(dataUri);
 
     if (!response.ok) {
@@ -225,7 +288,7 @@ const generateAuthorRow = (author: Author) => {
 
     const yearsActiveCell = document.createElement("div");
     yearsActiveCell.classList.add("author-data", "author-years");
-    yearsActiveCell.innerHTML = "----";
+    yearsActiveCell.innerHTML = getAgesActive(author);
     row.appendChild(yearsActiveCell);
 
     return row;
@@ -241,4 +304,26 @@ const getAuthorAge = (author: Author) => {
         const currentYear = new Date().getFullYear();
         return currentYear - birthYear;
     }
+}
+
+const getAgesActive = (author: Author): string => {
+    if (author.bibliography.length === 0) {
+        return "N/A"; 
+    }
+
+    const Ages = author.bibliography.map(book => book.year);
+    const startAge = Math.min(...Ages);
+    const endAge = Math.max(...Ages);
+
+    return `${startAge} - ${endAge}`;
+};
+
+const getYearsActive = (author: Author): [number, number] => {
+    if (author.bibliography.length === 0) return [0, 0];
+
+    const years = author.bibliography.map(book => book.year);
+    const startYear = Math.min(...years);
+    const endYear = Math.max(...years);
+
+    return [startYear, endYear];
 }

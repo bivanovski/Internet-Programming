@@ -37,9 +37,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 document.addEventListener("DOMContentLoaded", siteCode);
 var authors = [];
+var idSortAscending = true;
+var nameSortAscending = true;
+var birthDateSortAscending = true;
+var ageSortAscending = true;
+var nationalitySortAscending = true;
+var bibliographySortAscending = true;
+var yearsActiveSortAscending = true;
 function siteCode() {
     return __awaiter(this, void 0, void 0, function () {
-        var data, nameSort, idSort, birthDateSort, nationalitySort, bibliographySort, ageSort, applyFilterButton, modal_1, err_1;
+        var data, nameSort, idSort, birthDateSort, nationalitySort, bibliographySort, ageSort, yearsActiveSort, applyFilterButton, modal_1, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -55,13 +62,15 @@ function siteCode() {
                     idSort = document.getElementById("sort-id");
                     idSort.addEventListener("click", sortById);
                     birthDateSort = document.getElementById("sort-birth-date");
-                    birthDateSort.addEventListener("click", sortByBirthDate);
+                    birthDateSort.addEventListener("click", sortByBirth);
                     nationalitySort = document.getElementById("sort-nationality");
                     nationalitySort.addEventListener("click", sortByNationality);
                     bibliographySort = document.getElementById("sort-bibliography");
                     bibliographySort.addEventListener("click", sortByBibliography);
                     ageSort = document.getElementById("sort-age");
                     ageSort.addEventListener("click", sortByAge);
+                    yearsActiveSort = document.getElementById("sort-years-active");
+                    yearsActiveSort.addEventListener("click", sortByYearsActive);
                     applyFilterButton = document.getElementById("apply-filter");
                     applyFilterButton.addEventListener("click", applyFilter);
                     modal_1 = document.getElementById("biblio-details");
@@ -78,35 +87,81 @@ function siteCode() {
         });
     });
 }
-var nameSorter = function (first, second) { return first.name.localeCompare(second.name); };
-var idSorter = function (first, second) { return first.id - second.id; };
-var birthDateSorter = function (first, second) { return new Date(first.birth_date).getTime() - new Date(second.birth_date).getTime(); };
-var nationalitySorter = function (first, second) { return first.nationality.localeCompare(second.nationality); };
-var bibliographySorter = function (first, second) { return first.bibliography.length - second.bibliography.length; };
-var ageSorter = function (first, second) { return getAuthorAge(first) - getAuthorAge(second); };
-var sortByName = function () {
-    var sortedAuthors = authors.toSorted(nameSorter);
-    displayAuthors(sortedAuthors);
-};
 var sortById = function () {
-    var sortedAuthors = authors.toSorted(idSorter);
+    var sortedAuthors = authors.slice().sort(function (first, second) {
+        return idSortAscending ? first.id - second.id : second.id - first.id;
+    });
     displayAuthors(sortedAuthors);
+    idSortAscending = !idSortAscending;
+    var idSort = document.getElementById("sort-id");
+    idSort.innerText = idSortAscending ? "Sort ▲" : "Sort ▼";
 };
-var sortByBirthDate = function () {
-    var sortedAuthors = authors.toSorted(birthDateSorter);
+var sortByName = function () {
+    var sortedAuthors = authors.slice().sort(function (first, second) {
+        return nameSortAscending ? first.name.localeCompare(second.name) : second.name.localeCompare(first.name);
+    });
     displayAuthors(sortedAuthors);
+    nameSortAscending = !nameSortAscending;
+    var nameSort = document.getElementById("sort-name");
+    nameSort.innerText = nameSortAscending ? "Sort ▲" : "Sort ▼";
 };
-var sortByNationality = function () {
-    var sortedAuthors = authors.toSorted(nationalitySorter);
+var sortByBirth = function () {
+    var sortedAuthors = authors.slice().sort(function (first, second) {
+        return birthDateSortAscending ? first.birth_date.localeCompare(second.birth_date) : second.birth_date.localeCompare(first.birth_date);
+    });
     displayAuthors(sortedAuthors);
-};
-var sortByBibliography = function () {
-    var sortedAuthors = authors.toSorted(bibliographySorter);
-    displayAuthors(sortedAuthors);
+    birthDateSortAscending = !birthDateSortAscending;
+    var birthSort = document.getElementById("sort-birth");
+    birthSort.innerText = nameSortAscending ? "Sort ▲" : "Sort ▼";
 };
 var sortByAge = function () {
-    var sortedAuthors = authors.toSorted(ageSorter);
+    var sortedAuthors = authors.slice().sort(function (first, second) {
+        var firstAge = getAuthorAge(first);
+        var secondAge = getAuthorAge(second);
+        return ageSortAscending ? firstAge - secondAge : secondAge - firstAge;
+    });
     displayAuthors(sortedAuthors);
+    ageSortAscending = !ageSortAscending;
+    var ageSort = document.getElementById("sort-age");
+    ageSort.innerText = ageSortAscending ? "Sort ▲" : "Sort ▼";
+};
+var sortByNationality = function () {
+    var sortedAuthors = authors.slice().sort(function (first, second) {
+        return nationalitySortAscending ? first.nationality.localeCompare(second.nationality) : second.nationality.localeCompare(first.nationality);
+    });
+    displayAuthors(sortedAuthors);
+    nationalitySortAscending = !nationalitySortAscending;
+    var nationalitySort = document.getElementById("sort-nationality");
+    nationalitySort.innerText = nationalitySortAscending ? "Sort ▲" : "Sort ▼";
+};
+var sortByBibliography = function () {
+    var sortedAuthors = authors.slice().sort(function (first, second) {
+        return bibliographySortAscending ? first.bibliography.length - second.bibliography.length : second.bibliography.length - first.bibliography.length;
+    });
+    displayAuthors(sortedAuthors);
+    bibliographySortAscending = !bibliographySortAscending;
+    var bibliographySort = document.getElementById("sort-bibliography");
+    bibliographySort.innerText = bibliographySortAscending ? "Sort ▲" : "Sort ▼";
+};
+var sortByYearsActive = function () {
+    var sortedAuthors = authors.slice().sort(function (first, second) {
+        var _a = getYearsActive(first), firstStart = _a[0], firstEnd = _a[1];
+        var _b = getYearsActive(second), secondStart = _b[0], secondEnd = _b[1];
+        // First sort by start year (0 for N/A if no active years), then by end year (also 0 for N/A)
+        if (firstStart === 0 && secondStart === 0)
+            return 0; // both have no active years
+        if (firstStart === 0)
+            return 1; // first has no active years, comes after second
+        if (secondStart === 0)
+            return -1; // second has no active years, comes after first
+        if (firstStart !== secondStart)
+            return yearsActiveSortAscending ? firstStart - secondStart : secondStart - firstStart;
+        return yearsActiveSortAscending ? firstEnd - secondEnd : secondEnd - firstEnd;
+    });
+    displayAuthors(sortedAuthors);
+    yearsActiveSortAscending = !yearsActiveSortAscending;
+    var yearsActiveSort = document.getElementById("sort-years-active");
+    yearsActiveSort.innerText = yearsActiveSortAscending ? "Sort ▲" : "Sort ▼";
 };
 var fillNationalities = function (authors) {
     var filter = document.getElementById("nationality-filter");
@@ -151,7 +206,7 @@ var loadData = function () { return __awaiter(_this, void 0, void 0, function ()
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                dataUri = "https://raw.githubusercontent.com/sweko/uacs-internet-programming-exams/main/dry-run-mid-term/data/authors.json";
+                dataUri = " https://raw.githubusercontent.com/sweko/uacs-internet-programming-exams/main/dry-run-mid-term-2024/data/authors.json";
                 return [4 /*yield*/, fetch(dataUri)];
             case 1:
                 response = _a.sent();
@@ -222,7 +277,7 @@ var generateAuthorRow = function (author) {
     row.appendChild(biblioCell);
     var yearsActiveCell = document.createElement("div");
     yearsActiveCell.classList.add("author-data", "author-years");
-    yearsActiveCell.innerHTML = "----";
+    yearsActiveCell.innerHTML = getAgesActive(author);
     row.appendChild(yearsActiveCell);
     return row;
 };
@@ -237,4 +292,21 @@ var getAuthorAge = function (author) {
         var currentYear = new Date().getFullYear();
         return currentYear - birthYear;
     }
+};
+var getAgesActive = function (author) {
+    if (author.bibliography.length === 0) {
+        return "N/A";
+    }
+    var Ages = author.bibliography.map(function (book) { return book.year; });
+    var startAge = Math.min.apply(Math, Ages);
+    var endAge = Math.max.apply(Math, Ages);
+    return "".concat(startAge, " - ").concat(endAge);
+};
+var getYearsActive = function (author) {
+    if (author.bibliography.length === 0)
+        return [0, 0];
+    var years = author.bibliography.map(function (book) { return book.year; });
+    var startYear = Math.min.apply(Math, years);
+    var endYear = Math.max.apply(Math, years);
+    return [startYear, endYear];
 };
