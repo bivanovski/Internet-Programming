@@ -41,9 +41,12 @@ var idSortAscending = true;
 var titleSortAscending = true;
 var directorSortAscending = true;
 var yearSortAscending = true;
+var genreSortAscending = true;
+var castSortAscending = true;
+var oscarsSortAscending = true;
 function siteCode() {
     return __awaiter(this, void 0, void 0, function () {
-        var data, titleSort, idSort, directorSort, yearSort, applyFilterButton, err_1;
+        var data, titleSort, idSort, directorSort, yearSort, castSort, genreSort, oscarsSort, applyFilterButton, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -62,6 +65,12 @@ function siteCode() {
                     directorSort.addEventListener("click", sortByDirector);
                     yearSort = document.getElementById("sort-year");
                     yearSort.addEventListener("click", sortByYear);
+                    castSort = document.getElementById("sort-cast");
+                    castSort.addEventListener("click", sortByCast);
+                    genreSort = document.getElementById("sort-genre");
+                    genreSort.addEventListener("click", sortByGenre);
+                    oscarsSort = document.getElementById("sort-oscars");
+                    oscarsSort.addEventListener("click", sortByOscars);
                     applyFilterButton = document.getElementById("apply-filter");
                     applyFilterButton.addEventListener("click", applyFilter);
                     return [3 /*break*/, 3];
@@ -74,10 +83,6 @@ function siteCode() {
         });
     });
 }
-var titleSorter = function (first, second) { return first.title.localeCompare(second.title); };
-var idSorter = function (first, second) { return first.id - second.id; };
-var directorSorter = function (first, second) { return first.director.localeCompare(second.director); };
-var yearSorter = function (first, second) { return first.year - second.year; };
 var sortById = function () {
     var sortedMovies = movies.slice().sort(function (first, second) {
         return idSortAscending ? first.id - second.id : second.id - first.id;
@@ -113,6 +118,54 @@ var sortByYear = function () {
     yearSortAscending = !yearSortAscending;
     var yearSort = document.getElementById("sort-year");
     yearSort.innerText = yearSortAscending ? "Sort ▲" : "Sort ▼";
+};
+var sortByGenre = function () {
+    var sortedMovies = movies.slice().sort(function (a, b) {
+        if (a.genre.length !== b.genre.length)
+            return genreSortAscending ? a.genre.length - b.genre.length : b.genre.length - a.genre.length;
+        return genreSortAscending ? a.genre.join().localeCompare(b.genre.join()) : b.genre.join().localeCompare(a.genre.join());
+    });
+    displayMovies(sortedMovies);
+    genreSortAscending = !genreSortAscending;
+    var genreSort = document.getElementById("sort-genre");
+    genreSort.innerText = "Sort ".concat(genreSortAscending ? '▲' : '▼');
+};
+var sortByCast = function () {
+    var sortedMovies = movies.slice().sort(function (a, b) {
+        if (a.cast.length !== b.cast.length)
+            return castSortAscending ? a.cast.length - b.cast.length : b.cast.length - a.cast.length;
+        return castSortAscending ? a.cast.map(function (c) { return c.actor; }).join().localeCompare(b.cast.map(function (c) { return c.actor; }).join()) : b.cast.map(function (c) { return c.actor; }).join().localeCompare(a.cast.map(function (c) { return c.actor; }).join());
+    });
+    displayMovies(sortedMovies);
+    castSortAscending = !castSortAscending;
+    var castSort = document.getElementById("sort-cast");
+    castSort.innerText = "Sort ".concat(castSortAscending ? '▲' : '▼');
+};
+var sortByOscars = function () {
+    var sortedMovies = movies.slice().sort(function (a, b) {
+        // Ensure oscars is an array
+        var aOscars = Array.isArray(a.oscars) ? a.oscars : [];
+        var bOscars = Array.isArray(b.oscars) ? b.oscars : [];
+        // Check if either movie has no Oscars
+        var aHasOscars = aOscars.length > 0;
+        var bHasOscars = bOscars.length > 0;
+        if (aHasOscars && !bHasOscars)
+            return oscarsSortAscending ? -1 : 1;
+        if (!aHasOscars && bHasOscars)
+            return oscarsSortAscending ? 1 : -1;
+        // Compare by the number of Oscars if both have or both don't have Oscars
+        if (aOscars.length !== bOscars.length) {
+            return oscarsSortAscending ? aOscars.length - bOscars.length : bOscars.length - aOscars.length;
+        }
+        // If the number of Oscars is the same, compare by award names
+        var aAwards = aOscars.map(function (o) { return o.award; }).sort().join();
+        var bAwards = bOscars.map(function (o) { return o.award; }).sort().join();
+        return oscarsSortAscending ? aAwards.localeCompare(bAwards) : bAwards.localeCompare(aAwards);
+    });
+    displayMovies(sortedMovies);
+    oscarsSortAscending = !oscarsSortAscending;
+    var oscarsSort = document.getElementById("sort-oscars");
+    oscarsSort.innerText = "Sort ".concat(oscarsSortAscending ? '▲' : '▼');
 };
 var fillGenres = function (movies) {
     var filter = document.getElementById("genre-filter");

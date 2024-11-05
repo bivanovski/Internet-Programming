@@ -24,36 +24,41 @@ let nameSortAscending = true;
 let genreSortAscending = true;
 let formedSortAscending = true;
 let locationSortAscending = true;
+let albumsSortAscending = true;
+let membersSortAscending = true;
 
 async function siteCode() {
     try {
     const data = await loadData()
-    bands = data.metalBands
+    bands = data.metalBands;
 
-    fillGenres(bands)
-    fillCountries(bands)
-    displayBands(bands)
+    fillGenres(bands);
+    fillCountries(bands);
+    displayBands(bands);
 
     const idSort = document.getElementById("sort-id")!;
     idSort.addEventListener("click", sortById);
 
     const nameSort = document.getElementById("sort-name")!
-    nameSort.addEventListener("click", sortByName)
+    nameSort.addEventListener("click", sortByName);
 
     const genreSort = document.getElementById("sort-genre")!
-    genreSort.addEventListener("click", sortByGenre)
+    genreSort.addEventListener("click", sortByGenre);
 
     const formedSort = document.getElementById("sort-formed")!
-    formedSort.addEventListener("click", sortByFormed)
+    formedSort.addEventListener("click", sortByFormed);
 
     const locationSort = document.getElementById("sort-location")!
-    locationSort.addEventListener("click", sortByLocation)
+    locationSort.addEventListener("click", sortByLocation);
+
+    const membersSort = document.getElementById("sort-members")!;
+    membersSort.addEventListener("click", sortByMembers);
 
     const applyFilterButton = document.getElementById("apply-filter")!;
-    applyFilterButton.addEventListener("click", applyFilter)
+    applyFilterButton.addEventListener("click", applyFilter);
 
     }catch(err) {
-         console.log("Error", err)
+         console.log("Error", err);
     }
     
 }
@@ -111,6 +116,29 @@ const sortByLocation = () => {
 
     const locationSort = document.getElementById("sort-location")!;
     locationSort.innerText = locationSortAscending ? "Sort ▲" : "Sort ▼";
+}
+
+const sortByMembers = () => {
+    const sortedBands = bands.slice().sort((first, second) => {
+        const firstMembersCount = first.members.length;
+        const secondMembersCount = second.members.length;
+
+        // First sort by the number of members
+        if (firstMembersCount !== secondMembersCount) {
+            return membersSortAscending ? firstMembersCount - secondMembersCount : secondMembersCount - firstMembersCount;
+        }
+
+        // If the number of members is equal, sort by the first member's name
+        return membersSortAscending
+            ? first.members[0].localeCompare(second.members[0])
+            : second.members[0].localeCompare(first.members[0]);
+    });
+
+    displayBands(sortedBands);
+    membersSortAscending = !membersSortAscending;
+
+    const membersSort = document.getElementById("sort-members")!
+    membersSort.innerText = membersSortAscending ? "Sort ▲" : "Sort ▼";
 }
 
 const fillGenres = (bands: Band[]) => {

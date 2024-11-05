@@ -29,6 +29,9 @@ let idSortAscending = true;
 let titleSortAscending = true;
 let directorSortAscending = true;
 let yearSortAscending = true;
+let genreSortAscending = true;
+let castSortAscending = true;
+let oscarsSortAscending = true;
 
 async function siteCode() {
     try {
@@ -51,18 +54,21 @@ async function siteCode() {
     const yearSort = document.getElementById("sort-year")!
     yearSort.addEventListener("click", sortByYear)
 
+    const castSort = document.getElementById("sort-cast")!;
+    castSort.addEventListener("click", sortByCast);
+
+    const genreSort = document.getElementById("sort-genre")!;
+    genreSort.addEventListener("click", sortByGenre);
+
+    const oscarsSort = document.getElementById("sort-oscars")!;
+    oscarsSort.addEventListener("click", sortByOscars);
+
     const applyFilterButton = document.getElementById("apply-filter")!;
     applyFilterButton.addEventListener("click", applyFilter)
     } catch (err) {
         console.log(err)
     }
 }
-
-const titleSorter: MovieSorter = (first, second) => first.title.localeCompare(second.title);
-const idSorter: MovieSorter = (first, second) => first.id - second.id;
-const directorSorter: MovieSorter = (first, second) => first.director.localeCompare(second.director);
-const yearSorter: MovieSorter = (first, second) => first.year - second.year
-
 
 const sortById = () => {
     const sortedMovies = movies.slice().sort((first, second) => 
@@ -107,6 +113,63 @@ const sortByYear = () => {
     const yearSort = document.getElementById("sort-year")!;
     yearSort.innerText = yearSortAscending ? "Sort ▲" : "Sort ▼";
 }
+
+const sortByGenre = () => {
+    const sortedMovies = movies.slice().sort((a, b) => {
+        if (a.genre.length !== b.genre.length) return genreSortAscending ? a.genre.length - b.genre.length : b.genre.length - a.genre.length;
+        return genreSortAscending ? a.genre.join().localeCompare(b.genre.join()) : b.genre.join().localeCompare(a.genre.join());
+    });
+    displayMovies(sortedMovies);
+    genreSortAscending = !genreSortAscending;
+
+    const genreSort = document.getElementById("sort-genre")!;
+    genreSort.innerText = `Sort ${genreSortAscending ? '▲' : '▼'}`;
+};
+
+const sortByCast = () => {
+    const sortedMovies = movies.slice().sort((a, b) => {
+        if (a.cast.length !== b.cast.length) return castSortAscending ? a.cast.length - b.cast.length : b.cast.length - a.cast.length;
+        return castSortAscending ? a.cast.map(c => c.actor).join().localeCompare(b.cast.map(c => c.actor).join()) : b.cast.map(c => c.actor).join().localeCompare(a.cast.map(c => c.actor).join());
+    });
+    displayMovies(sortedMovies);
+    castSortAscending = !castSortAscending;
+
+    const castSort = document.getElementById("sort-cast")!;
+    castSort.innerText = `Sort ${castSortAscending ? '▲' : '▼'}`;
+};
+
+const sortByOscars = () => {
+    const sortedMovies = movies.slice().sort((a, b) => {
+        // Ensure oscars is an array
+        const aOscars = Array.isArray(a.oscars) ? a.oscars : [];
+        const bOscars = Array.isArray(b.oscars) ? b.oscars : [];
+
+        // Check if either movie has no Oscars
+        const aHasOscars = aOscars.length > 0;
+        const bHasOscars = bOscars.length > 0;
+
+        if (aHasOscars && !bHasOscars) return oscarsSortAscending ? -1 : 1;
+        if (!aHasOscars && bHasOscars) return oscarsSortAscending ? 1 : -1;
+
+        // Compare by the number of Oscars if both have or both don't have Oscars
+        if (aOscars.length !== bOscars.length) {
+            return oscarsSortAscending ? aOscars.length - bOscars.length : bOscars.length - aOscars.length;
+        }
+
+        // If the number of Oscars is the same, compare by award names
+        const aAwards = aOscars.map(o => o.award).sort().join();
+        const bAwards = bOscars.map(o => o.award).sort().join();
+        return oscarsSortAscending ? aAwards.localeCompare(bAwards) : bAwards.localeCompare(aAwards);
+    });
+
+    displayMovies(sortedMovies);
+    oscarsSortAscending = !oscarsSortAscending;
+
+    const oscarsSort = document.getElementById("sort-oscars")!;
+    oscarsSort.innerText = `Sort ${oscarsSortAscending ? '▲' : '▼'}`;
+};
+
+
 const fillGenres = (movies: Movie[]) => {
     const filter = document.getElementById("genre-filter") as HTMLSelectElement;
     const genres = Array.from(new Set(movies.flatMap(movie => movie.genre)));

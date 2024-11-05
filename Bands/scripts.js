@@ -42,9 +42,11 @@ var nameSortAscending = true;
 var genreSortAscending = true;
 var formedSortAscending = true;
 var locationSortAscending = true;
+var albumsSortAscending = true;
+var membersSortAscending = true;
 function siteCode() {
     return __awaiter(this, void 0, void 0, function () {
-        var data, idSort, nameSort, genreSort, formedSort, locationSort, applyFilterButton, err_1;
+        var data, idSort, nameSort, genreSort, formedSort, locationSort, membersSort, applyFilterButton, err_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -66,6 +68,8 @@ function siteCode() {
                     formedSort.addEventListener("click", sortByFormed);
                     locationSort = document.getElementById("sort-location");
                     locationSort.addEventListener("click", sortByLocation);
+                    membersSort = document.getElementById("sort-members");
+                    membersSort.addEventListener("click", sortByMembers);
                     applyFilterButton = document.getElementById("apply-filter");
                     applyFilterButton.addEventListener("click", applyFilter);
                     return [3 /*break*/, 3];
@@ -122,6 +126,24 @@ var sortByLocation = function () {
     locationSortAscending = !locationSortAscending;
     var locationSort = document.getElementById("sort-location");
     locationSort.innerText = locationSortAscending ? "Sort ▲" : "Sort ▼";
+};
+var sortByMembers = function () {
+    var sortedBands = bands.slice().sort(function (first, second) {
+        var firstMembersCount = first.members.length;
+        var secondMembersCount = second.members.length;
+        // First sort by the number of members
+        if (firstMembersCount !== secondMembersCount) {
+            return membersSortAscending ? firstMembersCount - secondMembersCount : secondMembersCount - firstMembersCount;
+        }
+        // If the number of members is equal, sort by the first member's name
+        return membersSortAscending
+            ? first.members[0].localeCompare(second.members[0])
+            : second.members[0].localeCompare(first.members[0]);
+    });
+    displayBands(sortedBands);
+    membersSortAscending = !membersSortAscending;
+    var membersSort = document.getElementById("sort-members");
+    membersSort.innerText = membersSortAscending ? "Sort ▲" : "Sort ▼";
 };
 var fillGenres = function (bands) {
     var filter = document.getElementById("genre-filter");
