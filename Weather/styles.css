@@ -1,0 +1,17 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+}
+
+#weather-result {
+    margin-top: 20px;
+    text-align: center; /* Center content inside this container */
+}
+
+#icon {
+    display: none; /* Make icon a block element */
+    margin: 10px auto 0; /* Center icon and add spacing from condition */
+    width: 50px;
+    height: 50px;
+}
