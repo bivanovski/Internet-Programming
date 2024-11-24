@@ -1,0 +1,15 @@
+<div class="episode-row">
+    <div class="episode-cell">{{ episode.rank }}</div>
+    <div class="episode-cell">{{ episode.title }}</div>
+    <div class="episode-cell">{{ episode.series }}</div>
+    <div class="episode-cell">{{ episode.era }}</div>
+    <div class="episode-cell">{{ getBroadcastDate() }}</div>
+    <div class="episode-cell">{{ episode.director }}</div>
+    <div class="episode-cell">{{ episode.writer }}</div>
+    <div class="episode-cell">{{ getDoctorDisplayName(episode) }}</div>
+    <div class="episode-cell">{{ getCompanionDisplayName(episode) }}</div>
+    <div class="episode-cell">{{ episode.cast.length }}</div>
+    <div class="episode-cell plot-preview">
+      {{ getPlotDisplay(episode) }}
+    </div>
+  </div>
